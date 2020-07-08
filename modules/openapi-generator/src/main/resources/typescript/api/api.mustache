@@ -8,7 +8,7 @@ import * as FormData from "form-data";
 {{/node}}
 {{/platforms}}
 import {ObjectSerializer} from '../models/ObjectSerializer{{extensionForDeno}}';
-import {ApiException} from './exception{{extensionForDeno}}';
+import { ApiException, UnknownStatus } from './exception{{extensionForDeno}}';
 import {isCodeInRange} from '../util{{extensionForDeno}}';
 {{#useInversify}}
 import { injectable } from "inversify";
@@ -212,8 +212,13 @@ export class {{classname}}ResponseProcessor {
             {{/returnType}}
         }
 
-        let body = response.body || "";
-    	throw new ApiException<string>(response.httpStatusCode, "Unknown API Status Code!\nBody: \"" + body + "\"");
+        let body: string;
+        try {
+          body = await response.body.text();
+        } catch {
+          body = "[Binary]";
+        }
+        throw new UnknownStatus(response.httpStatusCode, body);
     }
 			
 	{{/operation}}
