@@ -12,3 +12,9 @@ export class ApiException<T> extends Error {
         super("HTTP-Code: " + code + "\nMessage: " + JSON.stringify(body))  
 	}
 }
+
+export class UnknownStatus extends Error {
+    public constructor(public code: number, public body: string) {
+        super("Unknown HTTP-Code: " + code + "\nBody: " + body);
+    }
+}

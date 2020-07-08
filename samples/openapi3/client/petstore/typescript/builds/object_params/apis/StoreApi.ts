@@ -4,7 +4,7 @@ import {Configuration} from '../configuration';
 import { RequestContext, HttpMethod, ResponseContext, HttpFile} from '../http/http';
 import * as FormData from "form-data";
 import {ObjectSerializer} from '../models/ObjectSerializer';
-import {ApiException} from './exception';
+import { ApiException, UnknownStatus } from './exception';
 import {isCodeInRange} from '../util';
 
 import { Order } from '../models/Order';
@@ -189,8 +189,13 @@ export class StoreApiResponseProcessor {
             return;
         }
 
-        let body = response.body || "";
-    	throw new ApiException<string>(response.httpStatusCode, "Unknown API Status Code!\nBody: \"" + body + "\"");
+        let body: string;
+        try {
+          body = await response.body.text();
+        } catch {
+          body = "[Binary]";
+        }
+        throw new UnknownStatus(response.httpStatusCode, body);
     }
 			
     /**
@@ -219,8 +224,13 @@ export class StoreApiResponseProcessor {
             return body;
         }
 
-        let body = response.body || "";
-    	throw new ApiException<string>(response.httpStatusCode, "Unknown API Status Code!\nBody: \"" + body + "\"");
+        let body: string;
+        try {
+          body = await response.body.text();
+        } catch {
+          body = "[Binary]";
+        }
+        throw new UnknownStatus(response.httpStatusCode, body);
     }
 			
     /**
@@ -255,8 +265,13 @@ export class StoreApiResponseProcessor {
             return body;
         }
 
-        let body = response.body || "";
-    	throw new ApiException<string>(response.httpStatusCode, "Unknown API Status Code!\nBody: \"" + body + "\"");
+        let body: string;
+        try {
+          body = await response.body.text();
+        } catch {
+          body = "[Binary]";
+        }
+        throw new UnknownStatus(response.httpStatusCode, body);
     }
 			
     /**
@@ -288,8 +303,13 @@ export class StoreApiResponseProcessor {
             return body;
         }
 
-        let body = response.body || "";
-    	throw new ApiException<string>(response.httpStatusCode, "Unknown API Status Code!\nBody: \"" + body + "\"");
+        let body: string;
+        try {
+          body = await response.body.text();
+        } catch {
+          body = "[Binary]";
+        }
+        throw new UnknownStatus(response.httpStatusCode, body);
     }
 			
 }
