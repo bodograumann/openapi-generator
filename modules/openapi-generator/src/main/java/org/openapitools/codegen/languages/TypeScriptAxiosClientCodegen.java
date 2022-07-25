@@ -22,10 +22,7 @@ import io.swagger.v3.parser.util.SchemaTypeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.*;
 import org.openapitools.codegen.meta.features.DocumentationFeature;
-import org.openapitools.codegen.model.ModelMap;
-import org.openapitools.codegen.model.ModelsMap;
-import org.openapitools.codegen.model.OperationMap;
-import org.openapitools.codegen.model.OperationsMap;
+import org.openapitools.codegen.model.*;
 import org.openapitools.codegen.utils.ModelUtils;
 
 import java.util.*;
@@ -227,8 +224,8 @@ public class TypeScriptAxiosClientCodegen extends AbstractTypeScriptClientCodege
         }
 
         // Apply the model file name to the imports as well
-        for (Map<String, String> m : objs.getImports()) {
-            String javaImport = m.get("import").substring(modelPackage.length() + 1);
+        for (ImportMap m : objs.getImports()) {
+            String javaImport = m.getImport().substring(modelPackage.length() + 1);
             String tsImport = tsModelPackage + "/" + javaImport;
             m.put("tsImport", tsImport);
             m.put("class", javaImport);

@@ -23,8 +23,8 @@ public class OperationsMap extends HashMap<String, Object> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<Map<String, String>> getImports() {
-        return (List<Map<String, String>>) get("imports");
+    public List<ImportMap> getImports() {
+        return (List<ImportMap>) get("imports");
     }
 
 }

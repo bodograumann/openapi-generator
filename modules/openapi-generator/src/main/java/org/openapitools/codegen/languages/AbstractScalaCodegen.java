@@ -26,6 +26,7 @@ import io.swagger.v3.oas.models.media.StringSchema;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.*;
+import org.openapitools.codegen.model.ImportMap;
 import org.openapitools.codegen.model.ModelsMap;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.slf4j.Logger;
@@ -476,11 +477,11 @@ public abstract class AbstractScalaCodegen extends DefaultCodegen {
     @Override
     public ModelsMap postProcessModels(ModelsMap objs) {
         // remove model imports to avoid warnings for importing class in the same package in Scala
-        List<Map<String, String>> imports = objs.getImports();
+        List<ImportMap> imports = objs.getImports();
         final String prefix = modelPackage() + ".";
-        Iterator<Map<String, String>> iterator = imports.iterator();
+        Iterator<ImportMap> iterator = imports.iterator();
         while (iterator.hasNext()) {
-            String _import = iterator.next().get("import");
+            String _import = iterator.next().getImport();
             if (_import.startsWith(prefix)) iterator.remove();
         }
         return objs;

@@ -33,10 +33,7 @@ import org.openapitools.codegen.*;
 import org.openapitools.codegen.CodegenDiscriminator.MappedModel;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
-import org.openapitools.codegen.model.ModelMap;
-import org.openapitools.codegen.model.ModelsMap;
-import org.openapitools.codegen.model.OperationMap;
-import org.openapitools.codegen.model.OperationsMap;
+import org.openapitools.codegen.model.*;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -320,8 +317,8 @@ public class TypeScriptClientCodegen extends DefaultCodegen implements CodegenCo
     public OperationsMap postProcessOperationsWithModels(OperationsMap operations, List<ModelMap> models) {
 
         // Add additional filename information for model imports in the apis
-        List<Map<String, String>> imports = operations.getImports();
-        for (Map<String, String> im : imports) {
+        List<ImportMap> imports = operations.getImports();
+        for (ImportMap im : imports) {
             im.put("filename", im.get("import"));
         }
 
@@ -718,31 +715,16 @@ public class TypeScriptClientCodegen extends DefaultCodegen implements CodegenCo
         for (ModelMap mo : models) {
             CodegenModel cm = mo.getModel();
             // Add additional filename information for imports
-            mo.put("tsImports", toTsImports(cm, cm.imports));
             mo.put("currentDirImportPath", toCurrentDirImportPath(cm.classname));
         }
         return objs;
-    }
-
-    private List<Map<String, String>> toTsImports(CodegenModel cm, Set<String> imports) {
-        List<Map<String, String>> tsImports = new ArrayList<>();
-        for (String im : imports) {
-            if (!im.equals(cm.classname)) {
-                HashMap<String, String> tsImport = new HashMap<>();
-                // TVG: This is used as class name in the import statements of the model file
-                tsImport.put("classname", im);
-                tsImport.put("filename", toCurrentDirImportPath(im));
-                tsImports.add(tsImport);
-            }
-        }
-        return tsImports;
     }
 
     public String toCurrentDirImportPath(String className) {
         if (importMapping.containsKey(className)) {
             return importMapping.get(className);
         }
-	return "." + File.separator + toModelFilename(className);
+        return "." + File.separator + toModelFilename(className);
     }
 
     @Override

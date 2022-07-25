@@ -3,13 +3,12 @@ package org.openapitools.codegen.utils;
 import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.languages.GoClientCodegen;
+import org.openapitools.codegen.model.ImportMap;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class OneOfImplementorAdditionalDataTest {
     @Test
@@ -33,8 +32,8 @@ public class OneOfImplementorAdditionalDataTest {
         oneOfModel.interfaceModels = new ArrayList<>();
         oneOfModel.interfaceModels.add(interfaceModel);
 
-        List<Map<String, String>> interfaceModelImports = new ArrayList<>();
-        interfaceModelImports.add(new HashMap<String, String>(){{ put("import", "foo"); }});
+        List<ImportMap> interfaceModelImports = new ArrayList<>();
+        interfaceModelImports.add(new ImportMap(){{ put("import", "foo"); }});
 
         o.addFromInterfaceModel(oneOfModel, interfaceModelImports);
 
@@ -44,7 +43,7 @@ public class OneOfImplementorAdditionalDataTest {
         CodegenProperty cp3 = new CodegenProperty();
         cp3.baseName = "OtherProperty";
         implModel.vars.add(cp3);
-        List<Map<String, String>> implModelImports = new ArrayList<>();
+        List<ImportMap> implModelImports = new ArrayList<>();
         GoClientCodegen cc = new GoClientCodegen();
         cc.setModelPackage("openapi");
 

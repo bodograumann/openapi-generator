@@ -21,9 +21,7 @@ import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.parser.util.SchemaTypeUtil;
 import org.openapitools.codegen.*;
 import org.openapitools.codegen.meta.features.DocumentationFeature;
-import org.openapitools.codegen.model.ModelMap;
-import org.openapitools.codegen.model.ModelsMap;
-import org.openapitools.codegen.model.OperationsMap;
+import org.openapitools.codegen.model.*;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -217,9 +215,9 @@ public class TypeScriptRxjsClientCodegen extends AbstractTypeScriptClientCodegen
         // This method will add extra information to the operations.imports array.
         // The api template uses this information to import all the required
         // models for a given operation.
-        List<Map<String, String>> imports = operations.getImports();
-        for (Map<String, String> im : imports) {
-            im.put("className", im.get("import").replace("models.", ""));
+        List<ImportMap> imports = operations.getImports();
+        for (ImportMap im : imports) {
+            im.put("className", im.getImport().replace("models.", ""));
         }
     }
 

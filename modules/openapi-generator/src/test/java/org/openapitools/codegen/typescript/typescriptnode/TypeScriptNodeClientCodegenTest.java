@@ -7,10 +7,7 @@ import io.swagger.v3.oas.models.media.StringSchema;
 import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.TestUtils;
 import org.openapitools.codegen.languages.TypeScriptNodeClientCodegen;
-import org.openapitools.codegen.model.ModelMap;
-import org.openapitools.codegen.model.ModelsMap;
-import org.openapitools.codegen.model.OperationMap;
-import org.openapitools.codegen.model.OperationsMap;
+import org.openapitools.codegen.model.*;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -150,7 +147,7 @@ public class TypeScriptNodeClientCodegenTest {
         OperationsMap operations = createPostProcessOperationsMapWithImportName(importName);
 
         codegen.postProcessOperationsWithModels(operations, Collections.emptyList());
-        List<Map<String, String>> extractedImports = operations.getImports();
+        List<ImportMap> extractedImports = operations.getImports();
         Assert.assertEquals(extractedImports.get(0).get("filename"), importName);
     }
 
@@ -160,7 +157,7 @@ public class TypeScriptNodeClientCodegenTest {
         OperationsMap operations = createPostProcessOperationsMapWithImportName(importName);
 
         codegen.postProcessOperationsWithModels(operations, Collections.emptyList());
-        List<Map<String, String>> extractedImports = operations.getImports();
+        List<ImportMap> extractedImports = operations.getImports();
 
         Assert.assertEquals(extractedImports.get(0).get("filename"), importName);
     }
@@ -246,7 +243,7 @@ public class TypeScriptNodeClientCodegenTest {
         final ModelMap rootModelMap = new ModelMap();
         rootModelMap.setModel(root);
         rootModelsMap.setModels(Collections.singletonList(rootModelMap));
-        rootModelsMap.setImports(Collections.singletonList(Collections.singletonMap("import", "../model/Child")));
+        rootModelsMap.setImports(Collections.singletonList(new ImportMap("../model/Child")));
 
         final ModelsMap childModelsMap = new ModelsMap();
         final ModelMap childModelMap = new ModelMap();

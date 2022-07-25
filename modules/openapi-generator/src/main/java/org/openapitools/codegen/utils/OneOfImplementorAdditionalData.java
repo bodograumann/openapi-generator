@@ -9,6 +9,7 @@ import java.util.Set;
 import org.openapitools.codegen.CodegenConfig;
 import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenProperty;
+import org.openapitools.codegen.model.ImportMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +47,7 @@ public class OneOfImplementorAdditionalData {
     private String implementorName;
     private List<String> additionalInterfaces = new ArrayList<String>();
     private List<CodegenProperty> additionalProps = new ArrayList<CodegenProperty>();
-    private List<Map<String, String>> additionalImports = new ArrayList<Map<String, String>>();
+    private List<ImportMap> additionalImports = new ArrayList<ImportMap>();
     private final Logger LOGGER = LoggerFactory.getLogger(OneOfImplementorAdditionalData.class);
 
     public OneOfImplementorAdditionalData(String implementorName) {
@@ -63,7 +64,7 @@ public class OneOfImplementorAdditionalData {
      * @param cm model that the implementor should implement
      * @param modelsImports imports of the given `cm`
      */
-    public void addFromInterfaceModel(CodegenModel cm, List<Map<String, String>> modelsImports) {
+    public void addFromInterfaceModel(CodegenModel cm, List<ImportMap> modelsImports) {
         // Add cm as implemented interface
         additionalInterfaces.add(cm.classname);
 
@@ -92,9 +93,8 @@ public class OneOfImplementorAdditionalData {
         }
 
         // Add all imports of cm
-        for (Map<String, String> importMap : modelsImports) {
-            // we're ok with shallow clone here, because imports are strings only
-            additionalImports.add(new HashMap<>(importMap));
+        for (ImportMap importMap : modelsImports) {
+            additionalImports.add(new ImportMap(importMap));
         }
     }
 
@@ -107,7 +107,7 @@ public class OneOfImplementorAdditionalData {
      * @param addInterfaceImports whether or not to add the interface model as import (will vary by language)
      */
     @SuppressWarnings("unchecked")
-    public void addToImplementor(CodegenConfig cc, CodegenModel implcm, List<Map<String, String>> implImports, boolean addInterfaceImports) {
+    public void addToImplementor(CodegenConfig cc, CodegenModel implcm, List<ImportMap> implImports, boolean addInterfaceImports) {
         implcm.getVendorExtensions().putIfAbsent("x-implements", new ArrayList<String>());
 
         // Add implemented interfaces
@@ -117,7 +117,7 @@ public class OneOfImplementorAdditionalData {
             if (addInterfaceImports) {
                 // Add imports for interfaces
                 implcm.imports.add(intf);
-                Map<String, String> importsItem = new HashMap<String, String>();
+                ImportMap importsItem = new ImportMap();
                 importsItem.put("import", cc.toModelImport(intf));
                 implImports.add(importsItem);
             }
@@ -128,9 +128,9 @@ public class OneOfImplementorAdditionalData {
         implcm.hasVars = ! implcm.vars.isEmpty();
 
         // Add imports
-        for (Map<String, String> oneImport : additionalImports) {
+        for (ImportMap oneImport : additionalImports) {
             // exclude imports from this package - these are imports that only the oneOf interface needs
-            if (!implImports.contains(oneImport) && !oneImport.getOrDefault("import", "").startsWith(cc.modelPackage())) {
+            if (!implImports.contains(oneImport) && !oneImport.getImport().startsWith(cc.modelPackage())) {
                 implImports.add(oneImport);
             }
         }

@@ -22,10 +22,7 @@ import io.swagger.v3.oas.models.media.Schema;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.*;
-import org.openapitools.codegen.model.ModelMap;
-import org.openapitools.codegen.model.ModelsMap;
-import org.openapitools.codegen.model.OperationMap;
-import org.openapitools.codegen.model.OperationsMap;
+import org.openapitools.codegen.model.*;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -474,13 +471,13 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
         }
 
         // remove model imports to avoid error
-        List<Map<String, String>> imports = objs.getImports();
+        List<ImportMap> imports = objs.getImports();
         if (imports == null)
             return objs;
 
-        Iterator<Map<String, String>> iterator = imports.iterator();
+        Iterator<ImportMap> iterator = imports.iterator();
         while (iterator.hasNext()) {
-            String _import = iterator.next().get("import");
+            String _import = iterator.next().getImport();
             if (_import.startsWith(apiPackage()))
                 iterator.remove();
         }
@@ -488,7 +485,7 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
         // this will only import "fmt" and "strings" if there are items in pathParams
         for (CodegenOperation operation : operations) {
             if (operation.pathParams != null && operation.pathParams.size() > 0) {
-                imports.add(createMapping("import", "strings"));
+                imports.add(new ImportMap("strings"));
                 break; //just need to import once
             }
         }
@@ -500,34 +497,34 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
         for (CodegenOperation operation : operations) {
             // import "os" if the operation uses files
             if (!addedOSImport && "*os.File".equals(operation.returnType)) {
-                imports.add(createMapping("import", "os"));
+                imports.add(new ImportMap("os"));
                 addedOSImport = true;
             }
             for (CodegenParameter param : operation.allParams) {
                 // import "os" if the operation uses files
                 if (!addedOSImport && "*os.File".equals(param.dataType)) {
-                    imports.add(createMapping("import", "os"));
+                    imports.add(new ImportMap("os"));
                     addedOSImport = true;
                 }
 
                 // import "time" if the operation has a required time parameter.
                 if (param.required || !usesOptionals) {
                     if (!addedTimeImport && "time.Time".equals(param.dataType)) {
-                        imports.add(createMapping("import", "time"));
+                        imports.add(new ImportMap("time"));
                         addedTimeImport = true;
                     }
                 }
 
                 // import "reflect" package if the parameter is collectionFormat=multi
                 if (!addedReflectImport && param.isCollectionFormatMulti) {
-                    imports.add(createMapping("import", "reflect"));
+                    imports.add(new ImportMap("reflect"));
                     addedReflectImport = true;
                 }
 
                 // import "optionals" package if the parameter is optional
                 if (!param.required && usesOptionals) {
                     if (!addedOptionalImport) {
-                        imports.add(createMapping("import", "github.com/antihax/optional"));
+                        imports.add(new ImportMap("github.com/antihax/optional"));
                         addedOptionalImport = true;
                     }
 
@@ -565,17 +562,17 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
         }
 
         // recursively add import for mapping one type to multiple imports
-        List<Map<String, String>> recursiveImports = objs.getImports();
+        List<ImportMap> recursiveImports = objs.getImports();
         if (recursiveImports == null)
             return objs;
 
-        ListIterator<Map<String, String>> listIterator = imports.listIterator();
+        ListIterator<ImportMap> listIterator = imports.listIterator();
         while (listIterator.hasNext()) {
-            String _import = listIterator.next().get("import");
+            String _import = listIterator.next().getImport();
             // if the import package happens to be found in the importMapping (key)
             // add the corresponding import package to the list
             if (importMapping.containsKey(_import)) {
-                listIterator.add(createMapping("import", importMapping.get(_import)));
+                listIterator.add(new ImportMap(importMapping.get(_import)));
             }
         }
 
@@ -612,11 +609,11 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
     @Override
     public ModelsMap postProcessModels(ModelsMap objs) {
         // remove model imports to avoid error
-        List<Map<String, String>> imports = objs.getImports();
+        List<ImportMap> imports = objs.getImports();
         final String prefix = modelPackage();
-        Iterator<Map<String, String>> iterator = imports.iterator();
+        Iterator<ImportMap> iterator = imports.iterator();
         while (iterator.hasNext()) {
-            String _import = iterator.next().get("import");
+            String _import = iterator.next().getImport();
             if (_import.startsWith(prefix))
                 iterator.remove();
         }
@@ -628,17 +625,17 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
             for (CodegenProperty param : model.vars) {
                 if (!addedTimeImport
                     && ("time.Time".equals(param.dataType) || ("[]time.Time".equals(param.dataType)))) {
-                    imports.add(createMapping("import", "time"));
+                    imports.add(new ImportMap("time"));
                     addedTimeImport = true;
                 }
                 if (!addedOSImport && "*os.File".equals(param.baseType)) {
-                    imports.add(createMapping("import", "os"));
+                    imports.add(new ImportMap("os"));
                     addedOSImport = true;
                 }
             }
 
             if (this instanceof GoClientCodegen && model.isEnum) {
-                imports.add(createMapping("import", "fmt"));
+                imports.add(new ImportMap("fmt"));
             }
 
             // if oneOf contains "null" type
@@ -654,17 +651,17 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
             }
         }
         // recursively add import for mapping one type to multiple imports
-        List<Map<String, String>> recursiveImports = objs.getImports();
+        List<ImportMap> recursiveImports = objs.getImports();
         if (recursiveImports == null)
             return objs;
 
-        ListIterator<Map<String, String>> listIterator = imports.listIterator();
+        ListIterator<ImportMap> listIterator = imports.listIterator();
         while (listIterator.hasNext()) {
-            String _import = listIterator.next().get("import");
+            String _import = listIterator.next().getImport();
             // if the import package happens to be found in the importMapping (key)
             // add the corresponding import package to the list
             if (importMapping.containsKey(_import)) {
-                listIterator.add(createMapping("import", importMapping.get(_import)));
+                listIterator.add(new ImportMap(importMapping.get(_import)));
             }
         }
 
@@ -697,14 +694,7 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
         return input.replace("*/", "*_/").replace("/*", "/_*");
     }
 
-    public Map<String, String> createMapping(String key, String value) {
-        Map<String, String> customImport = new HashMap<>();
-        customImport.put(key, value);
-
-        return customImport;
-    }
-
-    @Override
+  @Override
     public String toEnumValue(String value, String datatype) {
         if (isNumberType(datatype) || "bool".equals(datatype)) {
             return value;

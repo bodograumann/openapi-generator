@@ -27,10 +27,7 @@ import org.openapitools.codegen.languages.features.GzipFeatures;
 import org.openapitools.codegen.languages.features.PerformBeanValidationFeatures;
 import org.openapitools.codegen.meta.features.DocumentationFeature;
 import org.openapitools.codegen.meta.features.GlobalFeature;
-import org.openapitools.codegen.model.ModelMap;
-import org.openapitools.codegen.model.ModelsMap;
-import org.openapitools.codegen.model.OperationMap;
-import org.openapitools.codegen.model.OperationsMap;
+import org.openapitools.codegen.model.*;
 import org.openapitools.codegen.templating.mustache.CaseFormatLambda;
 import org.openapitools.codegen.utils.ProcessUtils;
 import org.slf4j.Logger;
@@ -893,15 +890,13 @@ public class JavaClientCodegen extends AbstractJavaCodegen
         objs = super.postProcessModelsEnum(objs);
         //Needed import for Gson based libraries
         if (additionalProperties.containsKey(SERIALIZATION_LIBRARY_GSON)) {
-            List<Map<String, String>> imports = objs.getImports();
+            List<ImportMap> imports = objs.getImports();
             for (ModelMap mo : objs.getModels()) {
                 CodegenModel cm = mo.getModel();
                 // for enum model
                 if (Boolean.TRUE.equals(cm.isEnum) && cm.allowableValues != null) {
                     cm.imports.add(importMapping.get("SerializedName"));
-                    Map<String, String> item = new HashMap<String, String>();
-                    item.put("import", importMapping.get("SerializedName"));
-                    imports.add(item);
+                    imports.add(new ImportMap(importMapping.get("SerializedName")));
                 }
             }
         }
@@ -915,7 +910,7 @@ public class JavaClientCodegen extends AbstractJavaCodegen
         List<ModelMap> models = objs.getModels();
 
         if (additionalProperties.containsKey(SERIALIZATION_LIBRARY_JACKSON) && !JERSEY1.equals(getLibrary())) {
-            List<Map<String, String>> imports = objs.getImports();
+            List<ImportMap> imports = objs.getImports();
             for (ModelMap mo : models) {
                 CodegenModel cm = mo.getModel();
                 boolean addImports = false;
@@ -946,12 +941,8 @@ public class JavaClientCodegen extends AbstractJavaCodegen
 
                         // add import for Set, HashSet
                         cm.imports.add("Set");
-                        Map<String, String> importsSet = new HashMap<>();
-                        importsSet.put("import", "java.util.Set");
-                        imports.add(importsSet);
-                        Map<String, String> importsHashSet = new HashMap<>();
-                        importsHashSet.put("import", "java.util.HashSet");
-                        imports.add(importsHashSet);
+                        imports.add(new ImportMap("java.util.Set"));
+                        imports.add(new ImportMap("java.util.HashSet"));
                     }
 
                 }
@@ -963,9 +954,7 @@ public class JavaClientCodegen extends AbstractJavaCodegen
                     imports2Classnames.put("JsonIgnore", "com.fasterxml.jackson.annotation.JsonIgnore");
                     for (Map.Entry<String, String> entry : imports2Classnames.entrySet()) {
                         cm.imports.add(entry.getKey());
-                        Map<String, String> importsItem = new HashMap<>();
-                        importsItem.put("import", entry.getValue());
-                        imports.add(importsItem);
+                        imports.add(new ImportMap(entry.getValue()));
                     }
                 }
             }
@@ -1142,9 +1131,9 @@ public class JavaClientCodegen extends AbstractJavaCodegen
     }
 
     @Override
-    public void addImportsToOneOfInterface(List<Map<String, String>> imports) {
+    public void addImportsToOneOfInterface(List<ImportMap> imports) {
         for (String i : Arrays.asList("JsonSubTypes", "JsonTypeInfo", "JsonIgnoreProperties")) {
-            Map<String, String> oneImport = new HashMap<>();
+            ImportMap oneImport = new ImportMap();
             oneImport.put("import", importMapping.get(i));
             if (!imports.contains(oneImport)) {
                 imports.add(oneImport);

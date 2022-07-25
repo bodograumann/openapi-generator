@@ -19,7 +19,6 @@ package org.openapitools.codegen.languages;
 
 import com.google.common.collect.Iterables;
 import com.samskivert.mustache.Mustache;
-import com.samskivert.mustache.Template;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.apache.commons.lang3.StringUtils;
@@ -27,18 +26,13 @@ import org.openapitools.codegen.*;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
 import org.openapitools.codegen.meta.features.*;
-import org.openapitools.codegen.model.ModelMap;
-import org.openapitools.codegen.model.ModelsMap;
-import org.openapitools.codegen.model.OperationMap;
-import org.openapitools.codegen.model.OperationsMap;
+import org.openapitools.codegen.model.*;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.openapitools.codegen.utils.ProcessUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.*;
 
 import static org.openapitools.codegen.utils.StringUtils.camelize;
@@ -402,7 +396,7 @@ public class GoClientCodegen extends AbstractGoCodegen {
         // must be invoked at the beginning of this method.
         objs = super.postProcessModels(objs);
 
-        List<Map<String, String>> imports = objs.getImports();
+        List<ImportMap> imports = objs.getImports();
 
         for (ModelMap m : objs.getModels()) {
             CodegenModel model = m.getModel();
@@ -431,18 +425,18 @@ public class GoClientCodegen extends AbstractGoCodegen {
             // additional import for different cases
             // oneOf
             if (model.oneOf != null && !model.oneOf.isEmpty()) {
-                imports.add(createMapping("import", "fmt"));
+              imports.add(new ImportMap("fmt"));
             }
 
             // anyOf
             if (model.anyOf != null && !model.anyOf.isEmpty()) {
-                imports.add(createMapping("import", "fmt"));
+              imports.add(new ImportMap("fmt"));
             }
 
             // additionalProperties: true and parent
             if (model.isAdditionalPropertiesTrue && model.parent != null && Boolean.FALSE.equals(model.isMap)) {
-                imports.add(createMapping("import", "reflect"));
-                imports.add(createMapping("import", "strings"));
+              imports.add(new ImportMap("reflect"));
+              imports.add(new ImportMap("strings"));
             }
         }
         return objs;

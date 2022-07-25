@@ -39,9 +39,7 @@ import org.openapitools.codegen.meta.FeatureSet;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
 import org.openapitools.codegen.meta.features.*;
-import org.openapitools.codegen.model.ModelMap;
-import org.openapitools.codegen.model.ModelsMap;
-import org.openapitools.codegen.model.OperationsMap;
+import org.openapitools.codegen.model.*;
 import org.openapitools.codegen.serializer.SerializerUtils;
 import org.openapitools.codegen.templating.MustacheEngineAdapter;
 import org.openapitools.codegen.templating.mustache.*;
@@ -451,7 +449,7 @@ public class DefaultCodegen implements CodegenConfig {
                 ModelMap modelMapValue = new ModelMap(additionalProperties());
                 modelMapValue.setModel(cm);
 
-                List<Map<String, String>> importsValue = new ArrayList<>();
+                List<ImportMap> importsValue = new ArrayList<>();
                 ModelsMap objsValue = new ModelsMap();
                 objsValue.setModels(Collections.singletonList(modelMapValue));
                 objsValue.put("package", modelPackage());
@@ -465,7 +463,7 @@ public class DefaultCodegen implements CodegenConfig {
             // (see docstring of that class to find out what information is gathered and why)
             Map<String, OneOfImplementorAdditionalData> additionalDataMap = new HashMap<>();
             for (ModelsMap modelsAttrs : objs.values()) {
-                List<Map<String, String>> modelsImports = modelsAttrs.getImportsOrEmpty();
+                List<ImportMap> modelsImports = modelsAttrs.getImportsOrEmpty();
                 for (ModelMap mo : modelsAttrs.getModels()) {
                     CodegenModel cm = mo.getModel();
                     if (cm.oneOf.size() > 0) {
@@ -485,7 +483,7 @@ public class DefaultCodegen implements CodegenConfig {
             // Add all the data from OneOfImplementorAdditionalData classes to the implementing models
             for (Map.Entry<String, ModelsMap> modelsEntry : objs.entrySet()) {
                 ModelsMap modelsAttrs = modelsEntry.getValue();
-                List<Map<String, String>> imports = modelsAttrs.getImports();
+                List<ImportMap> imports = modelsAttrs.getImports();
                 for (ModelMap implmo : modelsAttrs.getModels()) {
                     CodegenModel implcm = implmo.getModel();
                     String modelName = toModelName(implcm.name);
@@ -7394,7 +7392,7 @@ public class DefaultCodegen implements CodegenConfig {
         addOneOfInterfaces.add(cm);
     }
 
-    public void addImportsToOneOfInterface(List<Map<String, String>> imports) {
+    public void addImportsToOneOfInterface(List<ImportMap> imports) {
     }
     //// End of methods related to the "useOneOfInterfaces" feature
 

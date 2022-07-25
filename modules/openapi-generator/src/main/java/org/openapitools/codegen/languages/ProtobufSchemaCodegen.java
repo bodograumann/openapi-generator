@@ -26,10 +26,7 @@ import org.openapitools.codegen.meta.Stability;
 import org.openapitools.codegen.meta.features.DocumentationFeature;
 import org.openapitools.codegen.meta.features.SecurityFeature;
 import org.openapitools.codegen.meta.features.WireFormatFeature;
-import org.openapitools.codegen.model.ModelMap;
-import org.openapitools.codegen.model.ModelsMap;
-import org.openapitools.codegen.model.OperationMap;
-import org.openapitools.codegen.model.OperationsMap;
+import org.openapitools.codegen.model.*;
 import org.openapitools.codegen.utils.ModelUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -46,10 +43,6 @@ import static org.openapitools.codegen.utils.StringUtils.camelize;
 import static org.openapitools.codegen.utils.StringUtils.underscore;
 
 public class ProtobufSchemaCodegen extends DefaultCodegen implements CodegenConfig {
-
-    private static final String IMPORT = "import";
-
-    private static final String IMPORTS = "imports";
 
     public static final String NUMBERED_FIELD_NUMBER_LIST = "numberedFieldNumberList";
 
@@ -375,21 +368,17 @@ public class ProtobufSchemaCodegen extends DefaultCodegen implements CodegenConf
         boolean skipImport = isImportAlreadyPresentInModel(objs, cm, modelFileName);
         if (!skipImport) {
             this.addImport(cm, importValue);
-            Map<String, String> importItem = new HashMap<>();
-            importItem.put(IMPORT, modelFileName);
-            objs.get(cm.getName()).getImports().add(importItem);
+            objs.get(cm.getName()).getImports().add(new ImportMap(modelFileName));
         }
     }
 
     private boolean isImportAlreadyPresentInModel(Map<String, ModelsMap> objs, CodegenModel cm, String importValue) {
         boolean skipImport = false;
-        List<Map<String, String>> cmImports = objs.get(cm.getName()).getImports();
-        for (Map<String, String> cmImportItem : cmImports) {
-            for (Entry<String, String> cmImportItemEntry : cmImportItem.entrySet()) {
-                if (importValue.equals(cmImportItemEntry.getValue())) {
-                    skipImport = true;
-                    break;
-                }
+        List<ImportMap> cmImports = objs.get(cm.getName()).getImports();
+        for (ImportMap cmImportItem : cmImports) {
+            if (importValue.equals(cmImportItem.getImport())) {
+                skipImport = true;
+                break;
             }
         }
         return skipImport;

@@ -44,11 +44,7 @@ import org.openapitools.codegen.languages.PythonClientCodegen;
 import org.openapitools.codegen.languages.PythonExperimentalClientCodegen;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
-import org.openapitools.codegen.model.ApiInfoMap;
-import org.openapitools.codegen.model.ModelMap;
-import org.openapitools.codegen.model.ModelsMap;
-import org.openapitools.codegen.model.OperationMap;
-import org.openapitools.codegen.model.OperationsMap;
+import org.openapitools.codegen.model.*;
 import org.openapitools.codegen.serializer.SerializerUtils;
 import org.openapitools.codegen.templating.CommonTemplateContentLocator;
 import org.openapitools.codegen.templating.GeneratorTemplateContentLocator;
@@ -1296,26 +1292,30 @@ public class DefaultGenerator implements Generator {
             allImports.addAll(cm.imports);
         }
         objs.setModels(modelMaps);
-        Set<String> importSet = new ConcurrentSkipListSet<>();
+        Map<String, Set<String>> importMap = new HashMap<>();
         for (String nextImport : allImports) {
             String mapping = config.importMapping().get(nextImport);
             if (mapping == null) {
                 mapping = config.toModelImport(nextImport);
             }
             if (mapping != null && !config.defaultIncludes().contains(mapping)) {
-                importSet.add(mapping);
+                if (!importMap.containsKey(mapping)) {
+                  importMap.put(mapping, new ConcurrentSkipListSet<>());
+                }
+                importMap.get(mapping).add(mapping);
             }
             // add instantiation types
             mapping = config.instantiationTypes().get(nextImport);
             if (mapping != null && !config.defaultIncludes().contains(mapping)) {
-                importSet.add(mapping);
+              if (!importMap.containsKey(mapping)) {
+                importMap.put(mapping, new ConcurrentSkipListSet<>());
+              }
+              importMap.get(mapping).add(mapping);
             }
         }
-        List<Map<String, String>> imports = new ArrayList<>();
-        for (String s : importSet) {
-            Map<String, String> item = new HashMap<>();
-            item.put("import", s);
-            imports.add(item);
+        List<ImportMap> imports = new ArrayList<>();
+        for (String s : importMap.keySet()) {
+            imports.add(new ImportMap(s, importMap.get(s)));
         }
         objs.setImports(imports);
         config.postProcessModels(objs);

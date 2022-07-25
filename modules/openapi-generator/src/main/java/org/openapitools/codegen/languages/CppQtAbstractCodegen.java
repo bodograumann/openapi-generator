@@ -6,9 +6,7 @@ import io.swagger.v3.parser.util.SchemaTypeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.*;
 import org.openapitools.codegen.meta.features.*;
-import org.openapitools.codegen.model.ModelMap;
-import org.openapitools.codegen.model.OperationMap;
-import org.openapitools.codegen.model.OperationsMap;
+import org.openapitools.codegen.model.*;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -316,7 +314,7 @@ public abstract class CppQtAbstractCodegen extends AbstractCppCodegen implements
         OperationMap objectMap = objs.getOperations();
         List<CodegenOperation> operations = objectMap.getOperation();
 
-        List<Map<String, String>> imports = objs.getImports();
+        List<ImportMap> imports = objs.getImports();
         Map<String, CodegenModel> codegenModels = new HashMap<>();
 
         for (ModelMap moObj : allModels) {
@@ -335,7 +333,7 @@ public abstract class CppQtAbstractCodegen extends AbstractCppCodegen implements
             // already done
             if (operation.returnBaseType != null && needToImport(operation.returnBaseType)) {
                 if (!isIncluded(operation.returnBaseType, imports)) {
-                    imports.add(createMapping("import", operation.returnBaseType));
+                    imports.add(new ImportMap(operation.returnBaseType));
                 }
             }
             List<CodegenParameter> params = new ArrayList<>();
@@ -346,21 +344,21 @@ public abstract class CppQtAbstractCodegen extends AbstractCppCodegen implements
             for (CodegenParameter param : params) {
                 if (param.isPrimitiveType && needToImport(param.baseType)) {
                     if (!isIncluded(param.baseType, imports)) {
-                        imports.add(createMapping("import", param.baseType));
+                        imports.add(new ImportMap(param.baseType));
                     }
                 }
             }
             if (operation.pathParams != null) {
                 // We use QString to pass path params, add it to include
                 if (!isIncluded("QString", imports)) {
-                    imports.add(createMapping("import", "QString"));
+                    imports.add(new ImportMap("QString"));
                 }
             }
         }
         if (isIncluded("QMap", imports)) {
             // Maps uses QString as key
             if (!isIncluded("QString", imports)) {
-                imports.add(createMapping("import", "QString"));
+                imports.add(new ImportMap("QString"));
             }
         }
         return objs;
@@ -376,17 +374,11 @@ public abstract class CppQtAbstractCodegen extends AbstractCppCodegen implements
         return "QString".equals(dataType);
     }
 
-    private Map<String, String> createMapping(String key, String value) {
-        Map<String, String> customImport = new HashMap<>();
-        customImport.put(key, toModelImport(value));
-        return customImport;
-    }
-
-    private boolean isIncluded(String type, List<Map<String, String>> imports) {
+    private boolean isIncluded(String type, List<ImportMap> imports) {
         boolean included = false;
         String inclStr = toModelImport(type);
-        for (Map<String, String> importItem : imports) {
-            if (importItem.containsValue(inclStr)) {
+        for (ImportMap importItem : imports) {
+            if (inclStr.equals(importItem.getImport())) {
                 included = true;
                 break;
             }

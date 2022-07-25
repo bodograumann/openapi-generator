@@ -23,10 +23,7 @@ import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 
 import org.openapitools.codegen.*;
-import org.openapitools.codegen.model.ModelMap;
-import org.openapitools.codegen.model.ModelsMap;
-import org.openapitools.codegen.model.OperationMap;
-import org.openapitools.codegen.model.OperationsMap;
+import org.openapitools.codegen.model.*;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -224,8 +221,8 @@ public class TypeScriptNodeClientCodegen extends AbstractTypeScriptClientCodegen
         objs.put("apiFilename", getApiFilenameFromClassname(objs.getClassname()));
 
         // Add additional filename information for model imports in the apis
-        List<Map<String, String>> imports = operations.getImports();
-        for (Map<String, String> im : imports) {
+        List<ImportMap> imports = operations.getImports();
+        for (ImportMap im : imports) {
             im.put("filename", im.get("import"));
         }
 

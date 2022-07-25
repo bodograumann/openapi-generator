@@ -24,10 +24,7 @@ import org.openapitools.codegen.*;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
 import org.openapitools.codegen.meta.features.*;
-import org.openapitools.codegen.model.ModelMap;
-import org.openapitools.codegen.model.ModelsMap;
-import org.openapitools.codegen.model.OperationMap;
-import org.openapitools.codegen.model.OperationsMap;
+import org.openapitools.codegen.model.*;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -453,27 +450,27 @@ public class LuaClientCodegen extends DefaultCodegen implements CodegenConfig {
     @Override
     public ModelsMap postProcessModels(ModelsMap objs) {
         // remove model imports to avoid error
-        List<Map<String, String>> imports = objs.getImports();
+        List<ImportMap> imports = objs.getImports();
         final String prefix = modelPackage();
-        Iterator<Map<String, String>> iterator = imports.iterator();
+        Iterator<ImportMap> iterator = imports.iterator();
         while (iterator.hasNext()) {
-            String _import = iterator.next().get("import");
+            String _import = iterator.next().getImport();
             if (_import.startsWith(prefix))
                 iterator.remove();
         }
 
         // recursively add import for mapping one type to multiple imports
-        List<Map<String, String>> recursiveImports = objs.getImports();
+        List<ImportMap> recursiveImports = objs.getImports();
         if (recursiveImports == null)
             return objs;
 
-        ListIterator<Map<String, String>> listIterator = imports.listIterator();
+        ListIterator<ImportMap> listIterator = imports.listIterator();
         while (listIterator.hasNext()) {
-            String _import = listIterator.next().get("import");
+            String _import = listIterator.next().getImport();
             // if the import package happens to be found in the importMapping (key)
             // add the corresponding import package to the list
             if (importMapping.containsKey(_import)) {
-                listIterator.add(createMapping("import", importMapping.get(_import)));
+                listIterator.add(new ImportMap(importMapping.get(_import)));
             }
         }
 
@@ -507,13 +504,6 @@ public class LuaClientCodegen extends DefaultCodegen implements CodegenConfig {
     @Override
     public String escapeUnsafeCharacters(String input) {
         return input.replace("]]", "] ]");
-    }
-
-    public Map<String, String> createMapping(String key, String value) {
-        Map<String, String> customImport = new HashMap<>();
-        customImport.put(key, value);
-
-        return customImport;
     }
 
     @Override

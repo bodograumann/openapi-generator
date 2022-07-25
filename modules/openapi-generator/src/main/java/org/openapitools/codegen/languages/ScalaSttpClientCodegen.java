@@ -28,10 +28,7 @@ import org.openapitools.codegen.*;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
 import org.openapitools.codegen.meta.features.*;
-import org.openapitools.codegen.model.ModelMap;
-import org.openapitools.codegen.model.ModelsMap;
-import org.openapitools.codegen.model.OperationMap;
-import org.openapitools.codegen.model.OperationsMap;
+import org.openapitools.codegen.model.*;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -274,25 +271,21 @@ public class ScalaSttpClientCodegen extends AbstractScalaCodegen implements Code
                 continue;
             }
             ModelsMap objs = models.get(openAPIName);
-            List<Map<String, String>> imports = objs.getImports();
+            List<ImportMap> imports = objs.getImports();
             if (imports == null || imports.isEmpty()) {
                 continue;
             }
-            List<Map<String, String>> newImports = new ArrayList<>();
-            Iterator<Map<String, String>> iterator = imports.iterator();
+            List<ImportMap> newImports = new ArrayList<>();
+            Iterator<ImportMap> iterator = imports.iterator();
             while (iterator.hasNext()) {
-                String importPath = iterator.next().get("import");
+                String importPath = iterator.next().getImport();
                 if (importPath.startsWith(prefix)) {
                      if (isEnumClass(importPath, enumRefs)) {
-                         Map<String, String> item = new HashMap<>();
-                         item.put("import", importPath.concat("._"));
-                         newImports.add(item);
+                         newImports.add(new ImportMap(importPath.concat("._")));
                      }
                  }
                  else {
-                      Map<String, String> item = new HashMap<>();
-                      item.put("import", importPath);
-                      newImports.add(item);
+                      newImports.add(new ImportMap(importPath));
                  }
 
             }

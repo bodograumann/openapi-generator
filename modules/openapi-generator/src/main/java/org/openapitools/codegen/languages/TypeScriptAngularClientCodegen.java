@@ -20,10 +20,7 @@ package org.openapitools.codegen.languages;
 import io.swagger.v3.oas.models.media.Schema;
 import org.openapitools.codegen.*;
 import org.openapitools.codegen.meta.features.DocumentationFeature;
-import org.openapitools.codegen.model.ModelMap;
-import org.openapitools.codegen.model.ModelsMap;
-import org.openapitools.codegen.model.OperationMap;
-import org.openapitools.codegen.model.OperationsMap;
+import org.openapitools.codegen.model.*;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.openapitools.codegen.utils.SemVer;
 import org.slf4j.Logger;
@@ -448,8 +445,8 @@ public class TypeScriptAngularClientCodegen extends AbstractTypeScriptClientCode
         operations.put("hasSomeFormParams", hasSomeFormParams);
 
         // Add additional filename information for model imports in the services
-        List<Map<String, String>> imports = operations.getImports();
-        for (Map<String, String> im : imports) {
+        List<ImportMap> imports = operations.getImports();
+        for (ImportMap im : imports) {
             // This property is not used in the templates any more, subject for removal
             im.put("filename", im.get("import"));
             im.put("classname", im.get("classname"));

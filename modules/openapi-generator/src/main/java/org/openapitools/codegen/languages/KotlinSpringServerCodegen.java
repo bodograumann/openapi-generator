@@ -27,10 +27,7 @@ import org.openapitools.codegen.languages.features.BeanValidationFeatures;
 import org.openapitools.codegen.languages.features.DocumentationProviderFeatures;
 import org.openapitools.codegen.languages.features.SwaggerUIFeatures;
 import org.openapitools.codegen.meta.features.*;
-import org.openapitools.codegen.model.ModelMap;
-import org.openapitools.codegen.model.ModelsMap;
-import org.openapitools.codegen.model.OperationMap;
-import org.openapitools.codegen.model.OperationsMap;
+import org.openapitools.codegen.model.*;
 import org.openapitools.codegen.utils.URLPathUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -700,7 +697,7 @@ public class KotlinSpringServerCodegen extends AbstractKotlinCodegen
         objs = super.postProcessModelsEnum(objs);
 
         //Add imports for Jackson
-        List<Map<String, String>> imports = objs.getImports();
+        List<ImportMap> imports = objs.getImports();
 
         objs.getModels().stream()
                 .map(ModelMap::getModel)
@@ -708,12 +705,8 @@ public class KotlinSpringServerCodegen extends AbstractKotlinCodegen
                 .forEach(cm -> {
                     cm.imports.add(importMapping.get("JsonValue"));
                     cm.imports.add(importMapping.get("JsonProperty"));
-                    Map<String, String> itemJsonValue = new HashMap<>();
-                    itemJsonValue.put("import", importMapping.get("JsonValue"));
-                    imports.add(itemJsonValue);
-                    Map<String, String> itemJsonProperty = new HashMap<>();
-                    itemJsonProperty.put("import", importMapping.get("JsonProperty"));
-                    imports.add(itemJsonProperty);
+                    imports.add(new ImportMap(importMapping.get("JsonValue")));
+                    imports.add(new ImportMap(importMapping.get("JsonProperty")));
                 });
 
         return objs;

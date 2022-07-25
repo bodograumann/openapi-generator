@@ -21,9 +21,7 @@ import io.swagger.v3.oas.models.media.ComposedSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import org.openapitools.codegen.*;
 import org.openapitools.codegen.meta.features.*;
-import org.openapitools.codegen.model.ModelMap;
-import org.openapitools.codegen.model.OperationMap;
-import org.openapitools.codegen.model.OperationsMap;
+import org.openapitools.codegen.model.*;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -293,7 +291,7 @@ public class GoServerCodegen extends AbstractGoCodegen {
         OperationMap objectMap = objs.getOperations();
         List<CodegenOperation> operations = objectMap.getOperation();
 
-        List<Map<String, String>> imports = objs.getImports();
+        List<ImportMap> imports = objs.getImports();
         if (imports == null)
             return objs;
 
@@ -306,14 +304,14 @@ public class GoServerCodegen extends AbstractGoCodegen {
             for (CodegenParameter param : operation.allParams) {
                 // import "os" if the operation uses files
                 if (!addedOSImport && ("*os.File".equals(param.dataType) || ("[]*os.File".equals(param.dataType)))) {
-                    imports.add(createMapping("import", "os"));
+                  imports.add(new ImportMap("os"));
                     addedOSImport = true;
                 }
 
                 // import "time" if the operation has a required time parameter
                 if (param.required) {
                     if (!addedTimeImport && "time.Time".equals(param.dataType)) {
-                        imports.add(createMapping("import", "time"));
+                      imports.add(new ImportMap("time"));
                         addedTimeImport = true;
                     }
                 }

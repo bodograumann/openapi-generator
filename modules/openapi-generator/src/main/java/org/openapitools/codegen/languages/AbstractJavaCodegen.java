@@ -36,10 +36,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.*;
 import org.openapitools.codegen.languages.features.DocumentationProviderFeatures;
 import org.openapitools.codegen.meta.features.*;
-import org.openapitools.codegen.model.ModelMap;
-import org.openapitools.codegen.model.ModelsMap;
-import org.openapitools.codegen.model.OperationMap;
-import org.openapitools.codegen.model.OperationsMap;
+import org.openapitools.codegen.model.*;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1358,19 +1355,17 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
     @Override
     public ModelsMap postProcessModels(ModelsMap objs) {
         // recursively add import for mapping one type to multiple imports
-        List<Map<String, String>> recursiveImports = objs.getImports();
+        List<ImportMap> recursiveImports = objs.getImports();
         if (recursiveImports == null)
             return objs;
 
-        ListIterator<Map<String, String>> listIterator = recursiveImports.listIterator();
+        ListIterator<ImportMap> listIterator = recursiveImports.listIterator();
         while (listIterator.hasNext()) {
-            String _import = listIterator.next().get("import");
+            String _import = listIterator.next().getImport();
             // if the import package happens to be found in the importMapping (key)
             // add the corresponding import package to the list
             if (importMapping.containsKey(_import)) {
-                Map<String, String> newImportMap = new HashMap<>();
-                newImportMap.put("import", importMapping.get(_import));
-                listIterator.add(newImportMap);
+                listIterator.add(new ImportMap(importMapping.get(_import)));
             }
         }
 
@@ -1390,10 +1385,10 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
     public OperationsMap postProcessOperationsWithModels(OperationsMap objs, List<ModelMap> allModels) {
         // Remove imports of List, ArrayList, Map and HashMap as they are
         // imported in the template already.
-        List<Map<String, String>> imports = objs.getImports();
+        List<ImportMap> imports = objs.getImports();
         Pattern pattern = Pattern.compile("java\\.util\\.(List|ArrayList|Map|HashMap)");
-        for (Iterator<Map<String, String>> itr = imports.iterator(); itr.hasNext(); ) {
-            String itrImport = itr.next().get("import");
+        for (Iterator<ImportMap> itr = imports.iterator(); itr.hasNext(); ) {
+            String itrImport = itr.next().getImport();
             if (pattern.matcher(itrImport).matches()) {
                 itr.remove();
             }
@@ -2109,10 +2104,10 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
     }
 
     @Override
-    public void addImportsToOneOfInterface(List<Map<String, String>> imports) {
+    public void addImportsToOneOfInterface(List<ImportMap> imports) {
         if (additionalProperties.containsKey(JACKSON)) {
             for (String i : Arrays.asList("JsonSubTypes", "JsonTypeInfo")) {
-                Map<String, String> oneImport = new HashMap<>();
+                ImportMap oneImport = new ImportMap();
                 oneImport.put("import", importMapping.get(i));
                 if (!imports.contains(oneImport)) {
                     imports.add(oneImport);

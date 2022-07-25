@@ -20,9 +20,7 @@ package org.openapitools.codegen.languages;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.parser.util.SchemaTypeUtil;
 import org.openapitools.codegen.*;
-import org.openapitools.codegen.model.ModelMap;
-import org.openapitools.codegen.model.ModelsMap;
-import org.openapitools.codegen.model.OperationsMap;
+import org.openapitools.codegen.model.*;
 import org.openapitools.codegen.utils.ModelUtils;
 
 import java.io.File;
@@ -209,9 +207,9 @@ public class TypeScriptReduxQueryClientCodegen extends AbstractTypeScriptClientC
         // This method will add extra information to the operations.imports array.
         // The api template uses this information to import all the required
         // models for a given operation.
-        List<Map<String, String>> imports = operations.getImports();
-        for (Map<String, String> im : imports) {
-            String[] parts = im.get("import").replace(modelPackage() + ".", "").split("( [|&] )|[<>]");
+        List<ImportMap> imports = operations.getImports();
+        for (ImportMap im : imports) {
+            String[] parts = im.getImport().replace(modelPackage() + ".", "").split("( [|&] )|[<>]");
             for (String s : parts) {
                 if (needToImport(s)) {
                     im.put("filename", im.get("import"));

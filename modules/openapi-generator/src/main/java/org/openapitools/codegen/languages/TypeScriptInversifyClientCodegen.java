@@ -23,10 +23,7 @@ import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.parser.util.SchemaTypeUtil;
 import org.openapitools.codegen.*;
 import org.openapitools.codegen.meta.features.DocumentationFeature;
-import org.openapitools.codegen.model.ModelMap;
-import org.openapitools.codegen.model.ModelsMap;
-import org.openapitools.codegen.model.OperationMap;
-import org.openapitools.codegen.model.OperationsMap;
+import org.openapitools.codegen.model.*;
 
 import java.io.File;
 import java.util.*;
@@ -248,10 +245,10 @@ public class TypeScriptInversifyClientCodegen extends AbstractTypeScriptClientCo
         }
 
         // Add additional filename information for model imports in the services
-        List<Map<String, String>> imports = operations.getImports();
-        for (Map<String, String> im : imports) {
-            im.put("filename", im.get("import"));
-            im.put("classname", getModelnameFromModelFilename(im.get("filename")));
+        List<ImportMap> imports = operations.getImports();
+        for (ImportMap im : imports) {
+            im.put("filename", im.getImport());
+            im.put("classname", getModelnameFromModelFilename(im.getImport()));
         }
 
         return operations;
