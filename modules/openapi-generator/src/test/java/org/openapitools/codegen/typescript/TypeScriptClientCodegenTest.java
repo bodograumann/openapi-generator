@@ -320,4 +320,37 @@ public class TypeScriptClientCodegenTest {
             }
         }
     }
+
+    @Test(description = "When two external files define a schema with the same name, the TS codegen should resolve the correct one based on the explicit $ref")
+    public void testExternalRefsSchemaNameCollision() throws Exception {
+        // main.yaml has two component schemas: SomeItem (refs inventory.yaml#/Pet)
+        // and Pet (refs pets.yaml#/Pet). Both external files define a schema named
+        // "Pet" with a single distinguishing property: inventory's has "name",
+        // pets' has "id".
+        //
+        // Bug: toClientOptInput parses with resolve=true. SomeItem loads
+        // inventory.yaml first, and its Pet gets cached in components.schemas["Pet"].
+        // The later explicit Pet: $ref to pets.yaml#/Pet finds "Pet" already cached
+        // and keeps the wrong one — the resolved Pet has property "name" instead
+        // of "id".
+        //
+        // Exact trigger: two components.schemas entries where the first $refs to
+        // an external file whose schema name collides with the second's target.
+        // Order matters — whichever external file is loaded first wins.
+        // No intermediate schema or transitive ref required; a direct $ref suffices.
+        final CodegenConfigurator configurator = new CodegenConfigurator()
+                .setGeneratorName("typescript")
+                .setInputSpec("src/test/resources/3_0/external-refs-collision/main.yaml")
+                .setOutputDir("target/out");
+
+        final ClientOptInput clientOptInput = configurator.toClientOptInput();
+        OpenAPI openAPI = clientOptInput.getOpenAPI();
+        Schema petSchema = openAPI.getComponents().getSchemas().get("Pet");
+        Assert.assertNotNull(petSchema, "Pet schema should be present in components");
+
+        Map<String, Schema> properties = petSchema.getProperties();
+        Assert.assertNotNull(properties, "Pet should have properties");
+        // Bug: properties should be {id} from pets.yaml, but is {name} from inventory.yaml
+        assertEquals(Collections.singleton("id"), properties.keySet());
+    }
 }
